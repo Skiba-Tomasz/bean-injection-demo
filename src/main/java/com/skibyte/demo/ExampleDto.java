@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.skibyte.demo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@MapConverter
 public class ExampleDto {
     private Integer id;
     private String name;

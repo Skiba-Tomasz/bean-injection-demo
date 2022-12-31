@@ -1,19 +1,23 @@
-package com.example.demo;
+package com.skibyte.demo;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ResolvableType;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -21,35 +25,49 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProviderBeanMaker {
 
+    public static final String BASE_PACKAGE = "com.skibyte.demo";
+
     private final ConfigurableApplicationContext applicationContext;
 
     @PostConstruct
-    void setup() throws ClassNotFoundException {
-        Class<?> aClass = ClassLoader.getSystemClassLoader().loadClass(ExampleDto.class.getCanonicalName());
-        ItemProvider<?> itemProvider = create(aClass);
+    void setup() {
+        ClassPathScanningCandidateComponentProvider provider =
+                new ClassPathScanningCandidateComponentProvider(false);
+        provider.addIncludeFilter(new AnnotationTypeFilter(MapConverter.class));
+        Set<BeanDefinition> beanDefs = provider
+                .findCandidateComponents(BASE_PACKAGE);
 
+        beanDefs.forEach(annotatedClass -> {
+            try {
+                String beanClassName = annotatedClass.getBeanClassName();
+                Class<?> aClass = ClassLoader.getSystemClassLoader().loadClass(beanClassName);
 
-        ResolvableType resolvableType = ResolvableType.forClassWithGenerics(ItemProvider.class, aClass);
-        RootBeanDefinition beanDefinition = new RootBeanDefinition();
-        beanDefinition.setTargetType(resolvableType);
-        beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
-        beanDefinition.setAutowireCandidate(true);
+                ItemProvider<?> itemProvider = create(aClass);
 
+                ResolvableType resolvableType = ResolvableType.forClassWithGenerics(ItemProvider.class, aClass);
+                RootBeanDefinition beanDefinition = new RootBeanDefinition();
+                beanDefinition.setTargetType(resolvableType);
+                beanDefinition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
+                beanDefinition.setAutowireCandidate(true);
 
-        DefaultListableBeanFactory bf = (DefaultListableBeanFactory) applicationContext.getBeanFactory();
-        bf.registerBeanDefinition("testBean", beanDefinition);
-        bf.registerSingleton("testBean", itemProvider);
+                String beanName = ItemProvider.class.getName() + itemProvider.hashCode();
 
+                DefaultListableBeanFactory bf = (DefaultListableBeanFactory) applicationContext.getBeanFactory();
+                bf.registerBeanDefinition(beanName, beanDefinition);
+                bf.registerSingleton(beanName, itemProvider);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    private <T> ItemProvider<T> create(Class<T> tClass){
+    private <T> ItemProvider<T> create(Class<T> tClass) {
         Map<String, Method> get = getGetterMethodByFiledName(tClass);
         return new ItemProvider<T>() {
             @Override
             public Map<String, ComplexMapField<?>> convert(T source) {
                 Map<String, ComplexMapField<?>> objectObjectHashMap = new HashMap<>();
                 get.entrySet()
-                        .stream()
                         .forEach(e -> {
                             try {
                                 Method method = e.getValue();

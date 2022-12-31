@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.skibyte.demo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,17 +14,21 @@ import java.util.Map;
 public class ProviderService implements CommandLineRunner {
 
     private final ItemProvider<ExampleDto> itemProvider;
+    private final ItemProvider<Example2Dto> itemProvider2;
 
     public Map<String, ComplexMapField<?>> provide(){
         ExampleDto dto = new ExampleDto(1, "test", LocalDateTime.now(), true);
         return itemProvider.convert(dto);
     }
+    public Map<String, ComplexMapField<?>> provide2(){
+        Example2Dto dto = new Example2Dto(9L, 2.0D);
+        return itemProvider2.convert(dto);
+    }
 
     @Override
     public void run(String... args) {
-        Map<String, ComplexMapField<?>> provide = this.provide();
-
-        log.info("provide = {}", provide);
+        log.info("provide = {}", this.provide());
+        log.info("provide2 = {}", this.provide2());
         log.info("Finished");
     }
 }

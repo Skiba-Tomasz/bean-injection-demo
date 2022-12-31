@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.skibyte.demo;
 
 import org.springframework.core.convert.converter.Converter;
 
