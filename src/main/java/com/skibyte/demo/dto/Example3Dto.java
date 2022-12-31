@@ -8,8 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-//@MapGenericConverter
-public class Example2Dto {
+@MapGenericConverter
+public class Example3Dto {
     private Long longValue;
     private Double doubleValue;
+    private NestedDto nestedDto;
 }

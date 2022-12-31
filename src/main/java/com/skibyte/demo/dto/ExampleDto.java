@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@MapGenericConverter
+//@MapGenericConverter
 public class ExampleDto {
     private Integer id;
     private String name;
