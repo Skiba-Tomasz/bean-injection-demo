@@ -1,5 +1,6 @@
 package com.skibyte.demo;
 
+import com.skibyte.demo.dto.ComplexMapField;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
-public class ProviderBeanMaker {
+public class MapGenericConverterBeanFactory {
 
     public static final String BASE_PACKAGE = "com.skibyte.demo";
 
@@ -33,7 +34,7 @@ public class ProviderBeanMaker {
     void setup() {
         ClassPathScanningCandidateComponentProvider provider =
                 new ClassPathScanningCandidateComponentProvider(false);
-        provider.addIncludeFilter(new AnnotationTypeFilter(MapConverter.class));
+        provider.addIncludeFilter(new AnnotationTypeFilter(MapGenericConverter.class));
         Set<BeanDefinition> beanDefs = provider
                 .findCandidateComponents(BASE_PACKAGE);
 

@@ -1,5 +1,8 @@
 package com.skibyte.demo;
 
+import com.skibyte.demo.dto.ComplexMapField;
+import com.skibyte.demo.dto.Example2Dto;
+import com.skibyte.demo.dto.ExampleDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

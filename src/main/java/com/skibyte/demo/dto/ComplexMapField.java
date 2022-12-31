@@ -1,4 +1,4 @@
-package com.skibyte.demo;
+package com.skibyte.demo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
